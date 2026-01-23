@@ -68,27 +68,42 @@ def run(pg_user, pg_pass, pg_host, pg_port, pg_db, year, month, chunksize, targe
     )
 
 
+    df_iter = None
+
     df_iter = pd.read_csv(
         url,
         dtype=dtype,
         parse_dates=parse_dates,
         iterator=True,
         chunksize=chunksize
-    )
+)
+
+    if df_iter is None:
+        raise RuntimeError("df_iter was not initialized")
 
 
     first = True
 
     for df_chunk in tqdm(df_iter):
+
         if first:
+            # Create table schema (no data)
             df_chunk.head(0).to_sql(
-                name=target_table,
+                name="yellow_taxi_data",
                 con=engine,
-                if_exists='replace'
+                if_exists="replace"
             )
             first = False
+            print("Table created")
 
-    df_chunk.to_sql(name=target_table, con=engine, if_exists="append", index=False)
+        # Insert chunk
+        df_chunk.to_sql(
+            name="yellow_taxi_data",
+            con=engine,
+            if_exists="append"
+        )
+
+        print("Inserted:", len(df_chunk))
 
 
 if __name__ == "__main__":
