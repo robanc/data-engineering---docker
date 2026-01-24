@@ -8,15 +8,15 @@ terraform {
 }
 
 provider "google" {
-  project = "project-6292d04f-07f5-426b-ad4"
-  region  = "us-central1"
+  project = var.project
+  region  = var.region
 }
 
 
 resource "google_storage_bucket" "demo-bucket" {
-  name          = "project-6292d04f-07f5-426b-ad4-terra-bucket"
-  location      = "US"
-  storage_class = "STANDARD"
+  name          = var.gcs_bucket_name
+  location      = var.location
+  storage_class = var.gcs_storage_class
   force_destroy = true
 
   uniform_bucket_level_access = true
@@ -29,4 +29,8 @@ resource "google_storage_bucket" "demo-bucket" {
       age = 1
     }
   }
+}
+
+resource "google_bigquery_dataset" "demo_dataset" {
+  dataset_id = var.bq_dataset_name
 }
