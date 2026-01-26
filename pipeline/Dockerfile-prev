@@ -1,0 +1,16 @@
+FROM python:3.13-slim
+
+# Set working directory
+WORKDIR /code
+
+# Copy requirements first to leverage caching
+COPY requirements.txt .
+
+# Install dependencies globally
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
+
+# Copy all code
+COPY . .
+
+# Use system python (no need to modify PATH)

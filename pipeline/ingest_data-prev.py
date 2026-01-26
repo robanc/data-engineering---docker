@@ -43,20 +43,17 @@ def ingest_parquet(file_url: str, table_name: str, engine, chunksize: int = 100_
 @click.option("--year", required=False, type=int)
 @click.option("--month", required=False, type=int)
 @click.option("--url", required=False)
-@click.option("--taxi_type", required=False, type=click.Choice(["yellow", "green"], case_sensitive=False), default="green")
-def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table, year, month, url, taxi_type):
+def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table, year, month, url):
     engine = create_engine(
         f"postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}"
     )
 
     if url:  # Taxi zones or custom CSV
         ingest_csv(url, target_table, engine)
-    else:
+    else:  # Yellow taxi trips (Parquet)
         if not (year and month):
             raise ValueError("Must provide --year and --month for taxi trip data")
-        
-        taxi_type = taxi_type.lower()
-        parquet_url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{year}-{month:02d}.parquet"
+        parquet_url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{year}-{month:02d}.parquet"
         ingest_parquet(parquet_url, target_table, engine)
 
 if __name__ == "__main__":

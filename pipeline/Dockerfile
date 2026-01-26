@@ -1,12 +1,18 @@
-FROM python:3.13.11-slim
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
+# Use slim Python image
+FROM python:3.13-slim
 
+# Set working directory
 WORKDIR /code
-ENV PATH="/code/.venv/bin:$PATH"
 
-COPY pyproject.toml .python-version uv.lock ./
-RUN uv sync --locked
+# Copy requirements first (leverages Docker cache)
+COPY requirements.txt .
 
-COPY ingest_data.py .
+# Install dependencies
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
 
-ENTRYPOINT ["uv", "run", "python", "ingest_data.py"]
+# Copy the rest of the code
+COPY . .
+
+# Set ENTRYPOINT to python so we can call scripts directly in docker-compose
+ENTRYPOINT ["python"]
