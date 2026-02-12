@@ -1,0 +1,43 @@
+version: 2
+
+models:
+
+  - name: fct_trips
+    description: "Fact table with one row per taxi trip"
+    columns:
+      - name: trip_id
+        description: "Unique trip surrogate key"
+        tests:
+          - not_null
+          - unique
+
+      - name: vendor_id
+        description: "Taxi vendor identifier"
+
+      - name: pickup_datetime
+        description: "Trip pickup timestamp"
+
+      - name: dropoff_datetime
+        description: "Trip dropoff timestamp"
+
+      - name: payment_type
+        description: "Payment type code"
+
+      - name: payment_type_name
+        description: "Human-readable payment type"
+
+  - name: dim_vendors
+    description: "Vendor dimension table"
+    columns:
+      - name: vendor_id
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_zones
+    description: "Taxi zone lookup dimension"
+    columns:
+      - name: location_id
+        tests:
+          - not_null
+          - unique
