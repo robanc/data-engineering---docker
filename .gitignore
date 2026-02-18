@@ -1,3 +1,21 @@
+# editors
+.vscode/
+
+# local db/logs
+*.duckdb
+*.db
+duckdb.db
+logs/
+
+# local lab folders (optional)
+my-first-pipeline/
+my_taxi_pipeline/
+my_taxi_pipeline_backup/
+
+# raw data files
+*.csv
+*.parquet
+
 *.parquet
 # Byte-compiled / optimized / DLL files
 __pycache__/
