@@ -1,6 +1,6 @@
 /* @bruin
 name: staging.trips
-type: bigquery.sql
+type: duckdb.sql
 connection: bigquery-defaultss
 
 depends:
