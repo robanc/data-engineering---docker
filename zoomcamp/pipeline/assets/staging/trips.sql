@@ -1,6 +1,6 @@
 /* @bruin
 name: staging.trips
-type: duckdb.sql
+type: bigquery.sql
 connection: bigquery-defaultss
 
 depends:
@@ -52,7 +52,13 @@ custom_checks:
   - name: no_duplicate_trips
     description: "Ensure no duplicate trips exist based on composite key"
     query: |
-      SELECT COUNT(*) - COUNT(DISTINCT pickup_datetime || '|' || COALESCE(CAST(pickup_location_id AS VARCHAR), '') || '|' || COALESCE(CAST(dropoff_location_id AS VARCHAR), '') || '|' || COALESCE(CAST(fare_amount AS VARCHAR), ''))
+      SELECT
+        COUNT(*) - COUNT(DISTINCT CONCAT(
+          CAST(pickup_datetime AS STRING), '|',
+          COALESCE(CAST(pickup_location_id AS STRING), ''), '|',
+          COALESCE(CAST(dropoff_location_id AS STRING), ''), '|',
+          COALESCE(CAST(fare_amount AS STRING), '')
+        ))
       FROM staging.trips
     value: 0
 
