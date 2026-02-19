@@ -8,8 +8,6 @@ materialization:
   type: table
   strategy: append
 
-# Define key columns for metadata and quality checks.
-# Raw data columns will be preserved as-is from parquet files.
 columns:
   - name: taxi_type
     type: string
@@ -17,9 +15,7 @@ columns:
   - name: extracted_at
     type: timestamp
     description: "Timestamp when data was extracted"
-
-@bruin
-"""
+@bruin"""
 
 import json
 import os
