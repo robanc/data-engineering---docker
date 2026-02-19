@@ -8,7 +8,7 @@ materialization:
   strategy: append
 
 # Point the asset to the python script
-script: trips.asset.py
+script: zoomcamp/pipeline/assets/ingestion/trips.asset.py
 
 columns:
   - name: taxi_type
