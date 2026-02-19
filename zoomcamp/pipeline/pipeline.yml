@@ -1,7 +1,7 @@
 name: nyc_taxi
 start_date: "2022-01-01"
 default_connections:
-  bigquery: bigquery-defaultss
+  bigquery: bigquery-default
 variables:
   taxi_types:
     type: array

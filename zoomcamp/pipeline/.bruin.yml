@@ -4,8 +4,12 @@ environments:
   default:
     connections:
       bigquery:
-        - name: "bigquery-defaultss"
+        - name: "bigquery-default"
           project_id: "db-bigquery-486618"
           dataset: "zoomcamp"
           location: "US"
           service_account_json: "${BIGQUERY_SERVICE_ACCOUNT_JSON}"
+
+      duckdb:
+        - name: "duckdb-default"
+          path: "/tmp/warehouse.duckdb"         
