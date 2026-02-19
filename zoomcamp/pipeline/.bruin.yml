@@ -4,7 +4,7 @@ environments:
   default:
     connections:
       bigquery:
-        - name: "bigquery-default"
+        - name: "bigquery-defaultss"
           project_id: "db-bigquery-486618"
           dataset: "zoomcamp"
           location: "US"
