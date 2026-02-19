@@ -1,3 +1,22 @@
+"""@bruin
+name: ingestion.trips
+type: python
+image: python:3.11
+connection: bigquery-defaultss
+
+materialization:
+  type: table
+  strategy: append
+
+script: zoomcamp/pipeline/assets/ingestion/trips.py
+
+columns:
+  - name: taxi_type
+    type: string
+  - name: extracted_at
+    type: timestamp
+@bruin"""
+
 import json
 import os
 from datetime import datetime, timezone
