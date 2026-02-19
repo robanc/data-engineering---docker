@@ -3,7 +3,7 @@
 name: ingestion.trips
 type: python
 image: python:3.11
-connection: bigquery-defaultss   # <-- FIX: make sure this matches your real connection name
+connection: bigquery-defaultss
 
 materialization:
   type: table
@@ -23,6 +23,7 @@ import json
 import os
 from datetime import datetime, timezone
 from io import BytesIO
+from typing import Optional  # ✅ FIX: avoid Python 3.10+ union syntax that can break asset discovery
 
 import pandas as pd
 import requests
@@ -103,16 +104,15 @@ def _empty_result() -> pd.DataFrame:
     Return an empty DataFrame WITH the declared schema columns.
     This avoids failures where the loader expects known columns even when there are 0 rows.
     """
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "taxi_type": pd.Series(dtype="string"),
             "extracted_at": pd.Series(dtype="datetime64[ns]"),
         }
     )
-    return df
 
 
-def _download_parquet_to_df(url: str, filename: str) -> pd.DataFrame | None:
+def _download_parquet_to_df(url: str, filename: str) -> Optional[pd.DataFrame]:
     """
     Download a parquet file. Returns a DataFrame if successful, None if unavailable (403/404).
     Raises for other errors.
@@ -148,7 +148,6 @@ def materialize() -> pd.DataFrame:
       - Returns an EMPTY DataFrame with schema (taxi_type, extracted_at) instead of raw empty DF
         to reduce downstream/load failures
     """
-    # dates from Bruin interval (fallbacks)
     start_date = _parse_date_env("BRUIN_START_DATE", DEFAULT_START)
     end_date = _parse_date_env("BRUIN_END_DATE", DEFAULT_END)
 
@@ -168,7 +167,6 @@ def materialize() -> pd.DataFrame:
     print(f"Taxi types: {taxi_types}")
 
     for month_date in months_to_process:
-        # Skip current/future months to avoid unpublished data
         month_start_utc = _first_day_of_month_utc(month_date.replace(tzinfo=timezone.utc))
         if month_start_utc >= this_month_utc:
             print(f"Skipping {month_date:%Y-%m} (current/future month)")
@@ -177,7 +175,6 @@ def materialize() -> pd.DataFrame:
         year = month_date.year
         month = month_date.month
 
-        # Optional safety guard to prevent accidental 2026 schedules, etc.
         if MAX_YEAR is not None and year > MAX_YEAR:
             print(f"Skipping {year}-{month:02d} (year exceeds MAX_YEAR={MAX_YEAR})")
             continue
