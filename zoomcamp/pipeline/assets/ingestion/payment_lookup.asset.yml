@@ -11,8 +11,8 @@ name: ingestion.payment_lookup
 # TODO: Set platform type.
 # Docs: https://getbruin.com/docs/bruin/assets/seed
 # suggested type: bigquery.seed
-type: duckdb.seed
-connection: duckdb-default
+type: bq.seed
+connection: bigquery-default
 
 # Path to the CSV file (relative to this .asset.yml file).
 # Can also be a URL: https://example.com/data.csv
