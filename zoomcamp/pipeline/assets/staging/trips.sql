@@ -1,6 +1,7 @@
 /* @bruin
 name: staging.trips
 type: duckdb.sql
+connection: duckdb-default
 
 depends:
   - ingestion.trips

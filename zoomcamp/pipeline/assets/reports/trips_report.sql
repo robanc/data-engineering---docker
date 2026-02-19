@@ -1,7 +1,7 @@
 /* @bruin
 name: reports.trips_report
 type: duckdb.sql
-connection: bigquery-defaultss
+connection: duckdb-default
 
 depends:
   - staging.trips

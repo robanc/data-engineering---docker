@@ -12,7 +12,7 @@ name: ingestion.payment_lookup
 # Docs: https://getbruin.com/docs/bruin/assets/seed
 # suggested type: bigquery.seed
 type: duckdb.seed
-connection: bigquery-defaultss
+connection: duckdb-default
 
 # Path to the CSV file (relative to this .asset.yml file).
 # Can also be a URL: https://example.com/data.csv
