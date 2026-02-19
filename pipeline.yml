@@ -1,3 +1,6 @@
 name: nyc_taxi_cloud
+
 assets:
-  - path: zoomcamp/pipeline/assets
+  - path: zoomcamp/pipeline/assets/ingestion
+  - path: zoomcamp/pipeline/assets/staging
+  - path: zoomcamp/pipeline/assets/reports
