@@ -19,29 +19,34 @@ columns:
     primary_key: true
     checks:
       - name: not_null
+
   - name: taxi_type
     type: string
     description: "Taxi type (yellow or green)"
     primary_key: true
     checks:
       - name: not_null
+
   - name: payment_type
     type: string
     description: "Payment type name"
     primary_key: true
     checks:
       - name: not_null
+
   - name: trip_count
     type: bigint
     description: "Number of trips"
     checks:
       - name: non_negative
       - name: positive
+
   - name: total_fare
     type: float
     description: "Total fare amount in USD"
     checks:
       - name: non_negative
+
   - name: avg_fare
     type: float
     description: "Average fare amount in USD"
@@ -54,8 +59,8 @@ custom_checks:
     query: |
       SELECT COUNT(*)
       FROM reports.trips_report
-      WHERE trip_date >= DATE('{{ start_date }}')
-        AND trip_date <  DATE('{{ end_date }}')
+      WHERE trip_date >= DATE(TIMESTAMP('{{ start_datetime }}'))
+        AND trip_date <  DATE(TIMESTAMP('{{ end_datetime }}'))
     operator: ">"
     value: 0
 
