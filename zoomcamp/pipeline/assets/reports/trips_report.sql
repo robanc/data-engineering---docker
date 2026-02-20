@@ -60,7 +60,7 @@ custom_checks:
       SELECT COUNT(*)
       FROM reports.trips_report
       WHERE trip_date >= DATE(TIMESTAMP('{{ start_datetime }}'))
-        AND trip_date <  DATE(TIMESTAMP('{{ end_datetime }}'))
+        AND trip_date <= DATE(TIMESTAMP('{{ end_datetime }}'))
     operator: ">"
     value: 0
 
