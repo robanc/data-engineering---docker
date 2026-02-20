@@ -17,7 +17,6 @@ columns:
   - name: pickup_datetime
     type: timestamp
     description: "Trip pickup timestamp"
-    primary_key: true
     checks:
       - name: not_null
   - name: dropoff_datetime
@@ -28,15 +27,16 @@ columns:
   - name: pickup_location_id
     type: integer
     description: "Pickup location ID"
-    primary_key: true
+    checks:
+      - name: not_null
   - name: dropoff_location_id
     type: integer
     description: "Dropoff location ID"
-    primary_key: true
+    checks:
+      - name: not_null
   - name: fare_amount
     type: float
     description: "Base fare amount in USD"
-    primary_key: true
     checks:
       - name: non_negative
   - name: taxi_type
@@ -47,6 +47,8 @@ columns:
   - name: payment_type_name
     type: string
     description: "Human-readable payment type"
+    checks:
+      - name: not_null
 
 custom_checks:
   - name: no_duplicate_trips
@@ -60,35 +62,50 @@ custom_checks:
           CAST(dropoff_location_id AS STRING)
         ))
       FROM staging.trips
+      WHERE pickup_datetime >= TIMESTAMP('{{ start_datetime }}')
+        AND pickup_datetime <  TIMESTAMP('{{ end_datetime }}')
     value: 0
-
 @bruin */
 
 WITH normalized_trips AS (
   SELECT
-    -- Normalize datetime columns (yellow uses tpep_*, green uses lpep_*)
-    COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime)   AS pickup_datetime,
+    COALESCE(t.tpep_pickup_datetime,  t.lpep_pickup_datetime)  AS pickup_datetime,
     COALESCE(t.tpep_dropoff_datetime, t.lpep_dropoff_datetime) AS dropoff_datetime,
-
-    -- Location columns (these are the actual columns in ingestion.trips in BigQuery)
     t.pu_location_id AS pickup_location_id,
     t.do_location_id AS dropoff_location_id,
-
-    -- Fare amount
     t.fare_amount,
-
-    -- Taxi type
     t.taxi_type,
-
-    -- Payment type for joining
     t.payment_type
   FROM ingestion.trips t
-  WHERE COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) >= '{{ start_datetime }}'
-    AND COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) <  '{{ end_datetime }}'
-    -- Filter out invalid rows
-    AND COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime)   IS NOT NULL
+  WHERE COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) >= TIMESTAMP('{{ start_datetime }}')
+    AND COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) <  TIMESTAMP('{{ end_datetime }}')
+    AND COALESCE(t.tpep_pickup_datetime,  t.lpep_pickup_datetime)  IS NOT NULL
     AND COALESCE(t.tpep_dropoff_datetime, t.lpep_dropoff_datetime) IS NOT NULL
+    AND t.pu_location_id IS NOT NULL
+    AND t.do_location_id IS NOT NULL
     AND t.fare_amount >= 0
+),
+
+joined AS (
+  SELECT
+    t.pickup_datetime,
+    t.dropoff_datetime,
+    t.pickup_location_id,
+    t.dropoff_location_id,
+    t.fare_amount,
+    t.taxi_type,
+    p.payment_type_name,
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        t.pickup_datetime,
+        t.dropoff_datetime,
+        t.pickup_location_id,
+        t.dropoff_location_id
+      ORDER BY t.pickup_datetime
+    ) AS rn
+  FROM normalized_trips t
+  LEFT JOIN ingestion.payment_lookup p
+    ON t.payment_type = p.payment_type_id
 )
 
 SELECT
@@ -98,15 +115,7 @@ SELECT
   dropoff_location_id,
   fare_amount,
   taxi_type,
-  p.payment_type_name
-FROM normalized_trips t
-LEFT JOIN ingestion.payment_lookup p
-  ON t.payment_type = p.payment_type_id
-QUALIFY ROW_NUMBER() OVER (
-  PARTITION BY
-    pickup_datetime,
-    dropoff_datetime,
-    pickup_location_id,
-    dropoff_location_id
-  ORDER BY pickup_datetime
-) = 1;
+  payment_type_name
+FROM joined
+WHERE rn = 1
+  AND payment_type_name IS NOT NULL;

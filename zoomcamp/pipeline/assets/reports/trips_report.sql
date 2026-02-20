@@ -54,21 +54,21 @@ custom_checks:
     query: |
       SELECT COUNT(*)
       FROM reports.trips_report
-      WHERE trip_date >= DATE('{{ start_datetime }}')
-        AND trip_date <= DATE('{{ end_datetime }}')
+      WHERE trip_date >= DATE('{{ start_date }}')
+        AND trip_date <  DATE('{{ end_date }}')
     operator: ">"
     value: 0
 
 @bruin */
 
 SELECT
-    DATE(pickup_datetime) AS trip_date,
-    taxi_type,
-    payment_type_name AS payment_type,
-    COUNT(*) AS trip_count,
-    SUM(fare_amount) AS total_fare,
-    AVG(fare_amount) AS avg_fare
+  DATE(pickup_datetime) AS trip_date,
+  taxi_type,
+  COALESCE(payment_type_name, 'Unknown') AS payment_type,
+  COUNT(*) AS trip_count,
+  SUM(fare_amount) AS total_fare,
+  AVG(fare_amount) AS avg_fare
 FROM staging.trips
-WHERE pickup_datetime >= '{{ start_datetime }}'
-  AND pickup_datetime < '{{ end_datetime }}'
-GROUP BY 1, 2, 3
+WHERE pickup_datetime >= TIMESTAMP('{{ start_datetime }}')
+  AND pickup_datetime <  TIMESTAMP('{{ end_datetime }}')
+GROUP BY 1, 2, 3;
