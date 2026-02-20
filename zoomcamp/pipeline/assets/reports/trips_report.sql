@@ -50,11 +50,14 @@ columns:
 
 custom_checks:
   - name: has_report_data
-    description: "Ensure report contains data"
+    description: "Report has at least 1 row for the interval"
     query: |
-      SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+      SELECT COUNT(*)
       FROM reports.trips_report
-    value: 1
+      WHERE trip_date >= DATE('{{ start_datetime }}')
+        AND trip_date <= DATE('{{ end_datetime }}')
+    operator: ">"
+    value: 0
 
 @bruin */
 
