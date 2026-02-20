@@ -57,7 +57,6 @@ custom_checks:
           CAST(pickup_datetime AS STRING), '|',
           COALESCE(CAST(pickup_location_id AS STRING), ''), '|',
           COALESCE(CAST(dropoff_location_id AS STRING), ''), '|',
-          COALESCE(CAST(fare_amount AS STRING), '')
         ))
       FROM staging.trips
     value: 0
@@ -108,6 +107,5 @@ QUALIFY ROW_NUMBER() OVER (
     dropoff_datetime,
     pickup_location_id,
     dropoff_location_id,
-    fare_amount
   ORDER BY pickup_datetime
 ) = 1;
