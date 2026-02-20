@@ -67,22 +67,26 @@ custom_checks:
 WITH normalized_trips AS (
   SELECT
     -- Normalize datetime columns (yellow uses tpep_*, green uses lpep_*)
-    COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) AS pickup_datetime,
+    COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime)   AS pickup_datetime,
     COALESCE(t.tpep_dropoff_datetime, t.lpep_dropoff_datetime) AS dropoff_datetime,
-    -- Normalize location columns (both use PULocationID/DOLocationID)
-    COALESCE(t.PULocationID, t.pu_location_id) AS pickup_location_id,
-    COALESCE(t.DOLocationID, t.do_location_id) AS dropoff_location_id,
+
+    -- Location columns (these are the actual columns in ingestion.trips in BigQuery)
+    t.pu_location_id AS pickup_location_id,
+    t.do_location_id AS dropoff_location_id,
+
     -- Fare amount
     t.fare_amount,
+
     -- Taxi type
     t.taxi_type,
+
     -- Payment type for joining
     t.payment_type
   FROM ingestion.trips t
   WHERE COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) >= '{{ start_datetime }}'
-    AND COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) < '{{ end_datetime }}'
+    AND COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) <  '{{ end_datetime }}'
     -- Filter out invalid rows
-    AND COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime) IS NOT NULL
+    AND COALESCE(t.tpep_pickup_datetime, t.lpep_pickup_datetime)   IS NOT NULL
     AND COALESCE(t.tpep_dropoff_datetime, t.lpep_dropoff_datetime) IS NOT NULL
     AND t.fare_amount >= 0
 )
@@ -106,4 +110,4 @@ QUALIFY ROW_NUMBER() OVER (
     dropoff_location_id,
     fare_amount
   ORDER BY pickup_datetime
-) = 1
+) = 1;
