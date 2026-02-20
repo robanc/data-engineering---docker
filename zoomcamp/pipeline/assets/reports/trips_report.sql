@@ -57,12 +57,12 @@ custom_checks:
   - name: has_report_data
     description: "Report has at least 1 row for the interval"
     query: |
-      SELECT COUNT(*)
+      SELECT IF(COUNT(*) > 0, 1, 0) AS ok
       FROM reports.trips_report
-      WHERE trip_date >= DATE(TIMESTAMP('{{ start_datetime }}'))
-        AND trip_date <= DATE(TIMESTAMP('{{ end_datetime }}'))
-    operator: ">"
-    value: 0
+      WHERE trip_date BETWEEN DATE(TIMESTAMP('{{ start_datetime }}'))
+                          AND DATE(TIMESTAMP('{{ end_datetime }}'))
+    operator: "="
+    value: 1
 
 @bruin */
 
@@ -76,4 +76,4 @@ SELECT
 FROM staging.trips
 WHERE pickup_datetime >= TIMESTAMP('{{ start_datetime }}')
   AND pickup_datetime <  TIMESTAMP('{{ end_datetime }}')
-GROUP BY 1, 2, 3;
+GROUP BY 1, 2, 3
