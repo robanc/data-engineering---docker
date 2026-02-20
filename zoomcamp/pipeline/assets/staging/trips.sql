@@ -55,8 +55,9 @@ custom_checks:
       SELECT
         COUNT(*) - COUNT(DISTINCT CONCAT(
           CAST(pickup_datetime AS STRING), '|',
-          COALESCE(CAST(pickup_location_id AS STRING), ''), '|',
-          COALESCE(CAST(dropoff_location_id AS STRING), ''), '|',
+          CAST(dropoff_datetime AS STRING), '|',
+          CAST(pickup_location_id AS STRING), '|',
+          CAST(dropoff_location_id AS STRING)
         ))
       FROM staging.trips
     value: 0
