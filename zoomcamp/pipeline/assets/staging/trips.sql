@@ -106,6 +106,6 @@ QUALIFY ROW_NUMBER() OVER (
     pickup_datetime,
     dropoff_datetime,
     pickup_location_id,
-    dropoff_location_id,
+    dropoff_location_id
   ORDER BY pickup_datetime
 ) = 1;
