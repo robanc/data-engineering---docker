@@ -1,0 +1,10 @@
+name: nyc_taxi
+start_date: "2022-01-01"
+default_connections:
+  bigquery: bigquery-default
+variables:
+  taxi_types:
+    type: array
+    items:
+      type: string
+    default: ["yellow", "green"]

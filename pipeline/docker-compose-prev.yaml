@@ -1,0 +1,62 @@
+services:
+  pgdatabase:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ny_taxi
+    volumes:
+      - ny_taxi_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_CONFIG_PROXY_X_HOST_COUNT: 1
+      PGADMIN_CONFIG_PROXY_X_PREFIX_COUNT: 1
+    ports:
+      - "8085:80"
+    depends_on:
+      - pgdatabase
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  taxi_ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      python ingest_data.py
+      --pg_user=root
+      --pg_pass=root
+      --pg_host=pgdatabase
+      --pg_port=5432
+      --pg_db=ny_taxi
+      --target_table=yellow_taxi_trips
+      --year=2025
+      --month=11
+    depends_on:
+      - pgdatabase
+
+  taxi_zones_ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      python ingest_data.py
+      --pg_user=root
+      --pg_pass=root
+      --pg_host=pgdatabase
+      --pg_port=5432
+      --pg_db=ny_taxi
+      --target_table=taxi_zones
+      --url=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/misc/taxi_zone_lookup.csv
+    depends_on:
+      - pgdatabase
+
+volumes:
+  ny_taxi_postgres_data:
+  pgadmin_data:
