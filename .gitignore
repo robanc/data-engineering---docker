@@ -1,0 +1,63 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual envs
+.venv/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data / outputs
+*.parquet
+*_repartitioned/
+yellow_*tripdata_*.parquet
+taxi_zone_lookup.csv
+
+# OS/editor
+.DS_Store
+.vscode/
+
+# Python / venv
+.venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (DO NOT COMMIT)
+data/
+spark-project/data/
+spark-project/notebooks/data/
+*.csv
+*.csv.gz
+*.parquet
+*.crc
+_SUCCESS
+
+# Spark outputs / temp dirs
+*_repartitioned*/
+yellow_nov_2025_repartitioned/
+tmp/
+spark-warehouse/
+
+# OS/editor
+.DS_Store
+.vscode/
+
+# Big files / jars
+*.jar
