@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: dim_question_tags
+    description: "One row per question and tag."
+    columns:
+      - name: question_id
+        tests:
+          - not_null
+      - name: tag
+        tests:
+          - not_null
+
+  - name: fct_questions_by_tag_month
+    description: "Monthly question counts and engagement metrics by tag."
+    columns:
+      - name: month
+        tests:
+          - not_null
+      - name: tag
+        tests:
+          - not_null
+      - name: question_count
+        tests:
+          - not_null
+
+  - name: mart_top_technologies
+    description: "Top technologies by total question volume."
+
+  - name: mart_tag_trends
+    description: "Monthly trends for selected technologies."

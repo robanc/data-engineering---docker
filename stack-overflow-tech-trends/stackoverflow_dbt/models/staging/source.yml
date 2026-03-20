@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: stackoverflow_raw
+    database: famous-gearing-490518-b7
+    schema: stackoverflow_pipeline
+    tables:
+      - name: stg_questions_ext
+        description: "External BigQuery table over Parquet files in GCS."
+        columns:
+          - name: id
+            tests:
+              - not_null

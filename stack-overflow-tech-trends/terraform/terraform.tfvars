@@ -1,0 +1,5 @@
+project_id  = "famous-gearing-490518-b7"
+region      = "us-central1"
+location    = "US"
+dataset_id  = "stackoverflow_pipeline"
+bucket_name = "stackoverflow-data-lake-famous-gearing"
