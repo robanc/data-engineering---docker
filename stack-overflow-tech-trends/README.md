@@ -14,7 +14,7 @@ The project answers questions such as:
 - How have technology trends changed over time?
 - Which technologies are growing in popularity?
 
-**This project uses a batch processing pipeline, where data is extracted, stored, and transformed in discrete steps rather than processed in real time.**
+**This project implements a batch processing pipeline where data is extracted, stored, and transformed in discrete steps rather than processed in real time.**
 
 ---
 
@@ -273,9 +273,39 @@ https://lookerstudio.google.com/reporting/f0ab5bff-d31a-4a2f-8789-9ad19f4c6254
 
 To reproduce this project:
 
-1. Create a Google Cloud project
-2. Enable required APIs (BigQuery, Cloud Storage, IAM)
-3. Run Terraform to provision infrastructure
+### 1. Create a Google Cloud project
+
+Create a new project in Google Cloud and note your `PROJECT_ID`.
+
+### 2. Authentication & Project Setup
+
+Authenticate with Google Cloud and set your project:
+
+```bash
+gcloud auth application-default login
+gcloud config set project YOUR_PROJECT_ID
+```
+
+Note:
+Each user must use their own Google Cloud account and project.
+This project does not use shared credentials.
+
+Make sure:
+- Billing is enabled on your GCP project
+- You have sufficient permissions (BigQuery Admin, Storage Admin or equivalent)
+
+This will configure Application Default Credentials (ADC), which are required for:
+
+- BigQuery access
+- Google Cloud Storage operations
+- dbt BigQuery connection
+
+### 3. Enable required APIs
+- BigQuery API
+- Cloud Storage API
+- IAM API
+
+### 4. Provision infrastructure with Terraform
 
 ```bash
 cd terraform
@@ -283,13 +313,22 @@ terraform init
 terraform apply
 ```
 
-4. Run SQL scripts located in the sql/ directory to prepare raw and external tables
+This will create:
 
-- Execute raw_questions.sql to extract filtered data  
-- Execute export_raw_questions_to_gcs.sql to export data to GCS  
-- Execute stg_questions_ext.sql to create the external table  
+- GCS bucket (data lake)
+- BigQuery dataset
+- Required cloud resources
 
-5. Run dbt transformations
+### 5. Execute the SQL scripts in the sql/ directory using the BigQuery console or bq CLI:
+
+- Execute 01_raw_questions.sql to extract filtered data  
+- Execute 02_export_raw_questions_to_gcs.sql to export data to GCS  
+- Execute 03_stg_questions_ext.sql to create the external table  
+
+### 6. Run dbt transformations
+
+Ensure dbt is installed and configured with a BigQuery profile.
+Then run:
 
 ```bash
 cd stackoverflow_dbt
@@ -297,7 +336,24 @@ dbt run
 dbt test
 ```
 
-6. Connect the mart tables to Looker Studio for visualization  
+### 7. Build Dashboard
+
+Use Looker Studio to visualize the results:
+
+1. Open Looker Studio: https://lookerstudio.google.com/
+2. Create a new report
+3. Add a data source → select BigQuery
+4. Choose your project and dataset
+5. Select the following tables:
+   - `mart_top_technologies`
+   - `mart_tag_trends`
+
+Suggested visualizations:
+- Bar chart: Top technologies by total questions
+- Time series chart: Technology trends over time (by tag and month)
+
+You can replicate the dashboard used in this project:
+https://lookerstudio.google.com/reporting/f0ab5bff-d31a-4a2f-8789-9ad19f4c6254  
 
 
 ## Project Structure
@@ -309,11 +365,8 @@ stack-overflow-tech-trends/
 │
 ├── sql/
 │   ├── 01_raw_questions.sql
-│   ├── 02_stg_questions_ext.sql
-│   ├── 03_dim_question_tags.sql
-│   ├── 04_fct_questions_by_tag_month.sql
-│   ├── 05_mart_top_technologies.sql
-│   └── 06_mart_tag_trends.sql
+│   ├── 02_export_raw_questions_to_gcs.sql
+│   ├── 03_stg_questions_ext.sql
 │
 ├── terraform/
 │   ├── main.tf
