@@ -37,6 +37,9 @@ Main fields used:
 
 The dataset contains **tens of millions of Stack Overflow questions**.
 
+Note:
+Data is analyzed up to 2024 to ensure completeness, as more recent data in the public dataset may be partial.
+
 ---
 
 ## Architecture
@@ -267,17 +270,35 @@ Interactive dashboard available here:
 https://lookerstudio.google.com/reporting/f0ab5bff-d31a-4a2f-8789-9ad19f4c6254
 
 
+
 ---
 
 ## Reproducibility
 
 To reproduce this project:
 
-### 1. Create a Google Cloud project
+### Prerequisites
+
+Ensure the following tools are installed:
+- Google Cloud SDK (gcloud)
+- Terraform
+- Python 3.x
+
+You also need:
+- A Google Cloud account with billing enabled
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/robanc/data-engineering---docker.git
+cd data-engineering---docker/stack-overflow-tech-trends
+```
+
+### 2. Create a Google Cloud project
 
 Create a new project in Google Cloud and note your `PROJECT_ID`.
 
-### 2. Authentication & Project Setup
+### 3. Authentication & Project Setup
 
 Authenticate with Google Cloud and set your project:
 
@@ -286,26 +307,36 @@ gcloud auth application-default login
 gcloud config set project YOUR_PROJECT_ID
 ```
 
-Note:
-Each user must use their own Google Cloud account and project.
-This project does not use shared credentials.
-
-Make sure:
-- Billing is enabled on your GCP project
-- You have sufficient permissions (BigQuery Admin, Storage Admin or equivalent)
-
 This will configure Application Default Credentials (ADC), which are required for:
 
 - BigQuery access
 - Google Cloud Storage operations
 - dbt BigQuery connection
 
-### 3. Enable required APIs
+**Note:**
+
+- Each user must use their own Google Cloud account and project  
+- This project does not use shared credentials  
+
+Ensure the following:
+
+- Billing is enabled on your GCP project  
+- You have sufficient permissions (BigQuery Admin, Storage Admin or equivalent)  
+
+### 4. Enable required APIs
 - BigQuery API
 - Cloud Storage API
 - IAM API
 
-### 4. Provision infrastructure with Terraform
+(Optional) You can enable APIs via CLI:
+
+```bash
+gcloud services enable bigquery.googleapis.com \
+  storage.googleapis.com \
+  iam.googleapis.com
+```
+
+### 5. Provision infrastructure with Terraform
 
 ```bash
 cd terraform
@@ -319,24 +350,46 @@ This will create:
 - BigQuery dataset
 - Required cloud resources
 
-### 5. Execute the SQL scripts in the sql/ directory using the BigQuery console or bq CLI:
+### 6. Run SQL Scripts (BigQuery)
 
-- Execute 01_raw_questions.sql to extract filtered data  
-- Execute 02_export_raw_questions_to_gcs.sql to export data to GCS  
-- Execute 03_stg_questions_ext.sql to create the external table  
+Run the SQL scripts in BigQuery (via the BigQuery console or `bq` CLI) in the following order:
+- 01_raw_questions.sql - extract filtered data  
+- 02_export_raw_questions_to_gcs.sql - export data to GCS  
+- 03_stg_questions_ext.sql - create the external table  
 
-### 6. Run dbt transformations
+### 7. Run dbt transformations
 
-Ensure dbt is installed and configured with a BigQuery profile.
-Then run:
+Navigate to the dbt project directory:
 
 ```bash
 cd stackoverflow_dbt
+```
+
+Ensure dbt is configured with a BigQuery profile (`profiles.yml`) pointing to your project.
+
+Create and activate a virtual environment, then install dbt:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Install dbt:
+
+```bash
+pip install dbt-bigquery
+```
+
+Make sure the virtual environment is activated before running dbt commands.
+
+Then run:
+
+```bash
 dbt run
 dbt test
 ```
 
-### 7. Build Dashboard
+### 8. Build Dashboard
 
 Use Looker Studio to visualize the results:
 
@@ -354,6 +407,11 @@ Suggested visualizations:
 
 You can replicate the dashboard used in this project:
 https://lookerstudio.google.com/reporting/f0ab5bff-d31a-4a2f-8789-9ad19f4c6254  
+
+
+### Note on Costs
+
+Running this project may incur small costs in BigQuery and Cloud Storage depending on usage.
 
 
 ## Project Structure
