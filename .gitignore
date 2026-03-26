@@ -297,3 +297,4 @@ dbt project/taxi_rides_ny/data/
 echo "archive/" >> .gitignore
 git add .gitignore
 git commit -m "Ignore archive folder"archive/
+archive/
