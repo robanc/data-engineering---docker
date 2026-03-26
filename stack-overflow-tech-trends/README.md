@@ -365,7 +365,30 @@ Navigate to the dbt project directory:
 cd stackoverflow_dbt
 ```
 
-Ensure dbt is configured with a BigQuery profile (`profiles.yml`) pointing to your project.
+Configure dbt with BigQuery profile by creating a `profiles.yml` file:
+
+```bash
+mkdir -p ~/.dbt
+nano ~/.dbt/profiles.yml
+```
+
+Example configuration (`profiles.yml`). Replace `YOUR_PROJECT_ID` with your actual GCP project ID:
+
+```yaml
+stackoverflow_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: YOUR_PROJECT_ID
+      dataset: stackoverflow_pipeline
+      threads: 4
+      timeout_seconds: 300
+      location: US
+```
+
+Save and exit the file after editing.
 
 Create and activate a virtual environment, then install dbt:
 
