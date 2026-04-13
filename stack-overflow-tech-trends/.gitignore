@@ -3,3 +3,6 @@
 *.tfstate.*
 crash.log
 .terraform.tfstate.lock.info
+*.tar.gz
+backup/
+*.parquet
